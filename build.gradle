@@ -1,0 +1,37 @@
+group 'testcase'
+version '0.1'
+
+apply plugin: 'java'
+apply plugin: 'scala'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.scala-lang:scala-library:2.12.5'
+
+    compile 'com.typesafe.scala-logging:scala-logging_2.12:3.7.2'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'org.slf4j:slf4j-api:1.7.25'
+
+    testCompile 'org.scalatest:scalatest_2.12:3.0.4'
+}
+
+task run(type: JavaExec, dependsOn: classes) {
+    classpath sourceSets.main.runtimeClasspath
+    main = 'testcase.exchange.Main'
+    standardInput = System.in
+}
+
+task scalaTest(dependsOn: ['testClasses'], type: JavaExec) {
+    main = 'org.scalatest.tools.Runner'
+    args = ['-R', 'build/classes/scala/test', '-o']
+    classpath sourceSets.test.runtimeClasspath
+}
+
+test.dependsOn scalaTest
