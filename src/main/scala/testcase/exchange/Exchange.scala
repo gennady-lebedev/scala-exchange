@@ -16,12 +16,11 @@ class Exchange extends LazyLogging {
     bids += bid
   }
 
-  def calculate(): Unit = {
+  def calculate(): (Int, Int) = {
     val sell = TreeMap(bids
       .filter(_.direction == Sell)
       .groupBy(_.price)
       .mapValues(_.map(_.amount).sum).toSeq:_*)
-
     logger.info("Sell map: {}", sell)
 
     val sellScanned = sell.scanLeft(0 -> 0)((a, b) => b._1 -> (a._2 + b._2))
@@ -31,11 +30,21 @@ class Exchange extends LazyLogging {
       .filter(_.direction == Buy)
       .groupBy(_.price)
       .mapValues(_.map(_.amount).sum).toSeq:_*)
-
     logger.info("Buy map: {}", buy)
 
     val buyScanned = buy.scanRight(0 -> 0)((a, b) => a._1 -> (a._2 + b._2))
     logger.info("Buy scanned: {}", buyScanned)
+
+    val deals = sellScanned.map { case(p, s) =>
+      (p, Math.min(s, buyScanned(p)))
+    }
+    logger.info("Deals: {}", deals)
+
+    deals.reduce((a, b) =>
+      if(a._2 > b._2) a
+      else if(a._2 < b._2) b
+      else/*a._2 == b._2*/(a._1 + b._1)/2 -> a._2
+    )
   }
 }
 
