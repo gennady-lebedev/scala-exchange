@@ -21,22 +21,23 @@ class Exchange extends LazyLogging {
       .filter(_.direction == Sell)
       .groupBy(_.price)
       .mapValues(_.map(_.amount).sum).toSeq:_*)
-    logger.info("Sell map: {}", sell)
+    logger.trace("Sell map: {}", sell)
 
     val sellScanned = sell.scanLeft(0 -> 0)((a, b) => b._1 -> (a._2 + b._2))
-    logger.info("Sell scanned: {}", sellScanned)
+    logger.trace("Sell scanned: {}", sellScanned)
 
     val buy = TreeMap(bids
       .filter(_.direction == Buy)
       .groupBy(_.price)
       .mapValues(_.map(_.amount).sum).toSeq:_*)
-    logger.info("Buy map: {}", buy)
+    logger.trace("Buy map: {}", buy)
 
     val buyScanned = buy.scanRight(0 -> 0)((a, b) => a._1 -> (a._2 + b._2))
-    logger.info("Buy scanned: {}", buyScanned)
+    logger.trace("Buy scanned: {}", buyScanned)
 
     val deals = sellScanned.map { case(p, s) =>
-      (p, Math.min(s, buyScanned(p)))
+      logger.trace("Sell more than {}: {}", p, buyScanned.from(p))
+      (p, Math.min(s, buyScanned.from(p).headOption.map(_._2).getOrElse(0)))
     }
     logger.info("Deals: {}", deals)
 
