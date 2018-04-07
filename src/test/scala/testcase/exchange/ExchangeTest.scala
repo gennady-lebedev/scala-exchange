@@ -46,7 +46,7 @@ class ExchangeTest extends WordSpec with Matchers {
     an[RuntimeException] should be thrownBy exchange.add(Bid(Sell, 100, 100))
   }
 
-  "endure a maximum size of random bids" ignore {
+  "endure a maximum size of random bids" in {
     def randomAmount: Int = ThreadLocalRandom.current().nextInt(Bid.minAmount, Bid.maxAmount + 1)
     def randomPrice: Int = ThreadLocalRandom.current().nextInt(Bid.minPrice, Bid.maxPrice + 1)
     def randomDirection: BidKind = if(ThreadLocalRandom.current().nextBoolean()) Buy else Sell
@@ -56,7 +56,7 @@ class ExchangeTest extends WordSpec with Matchers {
     exchange.calculate()
   }
 
-  "endure a maximum size of random bids 100 times" ignore {
+  "endure a maximum size of random bids 100 times" in {
     def randomAmount: Int = ThreadLocalRandom.current().nextInt(Bid.minAmount, Bid.maxAmount + 1)
     def randomPrice: Int = ThreadLocalRandom.current().nextInt(Bid.minPrice, Bid.maxPrice + 1)
     def randomDirection: BidKind = if(ThreadLocalRandom.current().nextBoolean()) Buy else Sell
