@@ -2,7 +2,13 @@ package testcase.exchange
 
 import testcase.exchange.BidTypes.{Buy, Sell}
 
-case class Bid(direction: BidType, amount: Int, price: Int)
+/**
+  * Representation of Bid
+  * @param kind Buy or Sell
+  * @param amount size of bid, between 1 and 1000
+  * @param price internal representation, cast decimal with precision 2 to Int, between 100 and 10000 (1.00 to 100.00)
+  */
+case class Bid(kind: BidKind, amount: Int, price: Int)
 
 object Bid {
   val minPrice = 100
@@ -18,7 +24,7 @@ object Bid {
     }
   }
 
-  def apply(direction: BidType, amount: Int, price: Double): Bid = {
+  def apply(direction: BidKind, amount: Int, price: Double): Bid = {
     val d = price * 100
     val p = d.toInt
     if(p == d)
@@ -33,7 +39,7 @@ object Bid {
   }
 }
 
-sealed trait BidType {
+sealed trait BidKind {
   override def toString: String = this match {
     case Buy => "Buy"
     case Sell => "Sell"
@@ -41,10 +47,10 @@ sealed trait BidType {
 }
 
 object BidTypes {
-  object Buy extends BidType
-  object Sell extends BidType
+  object Buy extends BidKind
+  object Sell extends BidKind
 
-  def apply(s: String): BidType = s match {
+  def apply(s: String): BidKind = s match {
     case "B" | "Buy" => Buy
     case "S" | "Sell" => Sell
     case other => throw new RuntimeException(s"Can't parse '$other', expected values: B, Buy, S, Sell")

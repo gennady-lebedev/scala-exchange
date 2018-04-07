@@ -17,7 +17,7 @@ class Exchange extends LazyLogging {
 
   def calculate(): (Int, Int) = {
     val sell = TreeMap(bids
-      .filter(_.direction == Sell)
+      .filter(_.kind == Sell)
       .groupBy(_.price)
       .mapValues(_.map(_.amount).sum).toSeq:_*)
     logger.trace("Sell map: {}", sell)
@@ -26,7 +26,7 @@ class Exchange extends LazyLogging {
     logger.trace("Sell scanned: {}", sellScanned)
 
     val buy = TreeMap(bids
-      .filter(_.direction == Buy)
+      .filter(_.kind == Buy)
       .groupBy(_.price)
       .mapValues(_.map(_.amount).sum).toSeq:_*)
     logger.trace("Buy map: {}", buy)

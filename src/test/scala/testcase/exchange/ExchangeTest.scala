@@ -6,14 +6,21 @@ import org.scalatest.{Matchers, WordSpec}
 import testcase.exchange.BidTypes._
 
 class ExchangeTest extends WordSpec with Matchers {
-  "exchange should match pair of bids with same price and amount" in {
+  "match pair of bids with same price and amount" in {
     val exchange = new Exchange
     exchange.add(Bid(Buy, 100, 100))
     exchange.add(Bid(Sell, 100, 100))
     exchange.calculate() should be (100, 100)
   }
 
-  "exchange should match couple of bids with same prices and amounts" in {
+  "fail if bids doesn't match by price" in {
+    val exchange = new Exchange
+    exchange.add(Bid(Buy, 10, 100))
+    exchange.add(Bid(Sell, 100, 100))
+    exchange.calculate() should be (0, 0)
+  }
+
+  "match couple of bids with same prices and amounts" in {
     val exchange = new Exchange
     exchange.add(Bid(Buy, 100, 100))
     exchange.add(Bid(Buy, 100, 100))
@@ -24,7 +31,7 @@ class ExchangeTest extends WordSpec with Matchers {
     exchange.calculate() should be (100, 300)
   }
 
-  "exchange should ignore not optimal prices" in {
+  "ignore not optimal prices" in {
     val exchange = new Exchange
     exchange.add(Bid(Buy, 100, 50))
     exchange.add(Bid(Buy, 100, 10))
@@ -33,26 +40,26 @@ class ExchangeTest extends WordSpec with Matchers {
     exchange.calculate() should be (50, 100)
   }
 
-  "exchange should reject 1.000.001's bid" in {
+  "reject 1.000.001's bid" in {
     val exchange = new Exchange
     for(_ <- 1 to Exchange.limit) exchange.add(Bid(Buy, 100, 100))
     an[RuntimeException] should be thrownBy exchange.add(Bid(Sell, 100, 100))
   }
 
-  "exchange should endure a maximum size of random bids" in {
+  "endure a maximum size of random bids" ignore {
     def randomAmount: Int = ThreadLocalRandom.current().nextInt(Bid.minAmount, Bid.maxAmount + 1)
     def randomPrice: Int = ThreadLocalRandom.current().nextInt(Bid.minPrice, Bid.maxPrice + 1)
-    def randomDirection: BidType = if(ThreadLocalRandom.current().nextBoolean()) Buy else Sell
+    def randomDirection: BidKind = if(ThreadLocalRandom.current().nextBoolean()) Buy else Sell
 
     val exchange = new Exchange
     for(_ <- 1 to Exchange.limit) exchange.add(Bid(randomDirection, randomAmount, randomPrice))
     exchange.calculate()
   }
 
-  "exchange should endure a maximum size of random bids 100 times" ignore {
+  "endure a maximum size of random bids 100 times" ignore {
     def randomAmount: Int = ThreadLocalRandom.current().nextInt(Bid.minAmount, Bid.maxAmount + 1)
     def randomPrice: Int = ThreadLocalRandom.current().nextInt(Bid.minPrice, Bid.maxPrice + 1)
-    def randomDirection: BidType = if(ThreadLocalRandom.current().nextBoolean()) Buy else Sell
+    def randomDirection: BidKind = if(ThreadLocalRandom.current().nextBoolean()) Buy else Sell
 
     for(_ <- 1 to 100) {
       val exchange = new Exchange
