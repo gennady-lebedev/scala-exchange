@@ -15,9 +15,9 @@ class ExchangeTest extends WordSpec with Matchers {
 
   "fail if bids doesn't match by price" in {
     val exchange = new Exchange
-    exchange.add(Bid(Buy, 10, 100))
-    exchange.add(Bid(Sell, 100, 100))
-    exchange.calculate() should be (0, 0)
+    exchange.add(Bid(Buy, 100, 10.00))
+    exchange.add(Bid(Sell, 100, 100.00))
+    exchange.calculate()._2 should be (0)
   }
 
   "match couple of bids with same prices and amounts" in {
