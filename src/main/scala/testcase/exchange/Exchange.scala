@@ -7,11 +7,10 @@ import scala.collection.mutable
 import scala.collection.immutable.TreeMap
 
 class Exchange extends LazyLogging {
-  private val limit: Int = 1000000
   private val bids = mutable.MutableList[Bid]()
 
   def add(bid: Bid): Unit = {
-    if(bids.size >= limit) throw new RuntimeException("Orders limit exceeded")
+    if(bids.size >= Exchange.limit) throw new RuntimeException("Orders limit exceeded")
 
     bids += bid
   }
@@ -50,5 +49,5 @@ class Exchange extends LazyLogging {
 }
 
 object Exchange {
-
+  val limit: Int = 1000000
 }

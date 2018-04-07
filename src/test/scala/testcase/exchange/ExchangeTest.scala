@@ -1,5 +1,7 @@
 package testcase.exchange
 
+import java.util.concurrent.ThreadLocalRandom
+
 import org.scalatest.{Matchers, WordSpec}
 import testcase.exchange.BidTypes._
 
@@ -29,5 +31,33 @@ class ExchangeTest extends WordSpec with Matchers {
     exchange.add(Bid(Sell, 100, 90))
     exchange.add(Bid(Sell, 100, 50))
     exchange.calculate() should be (50, 100)
+  }
+
+  "exchange should reject 1.000.001's bid" in {
+    val exchange = new Exchange
+    for(_ <- 1 to Exchange.limit) exchange.add(Bid(Buy, 100, 100))
+    an[RuntimeException] should be thrownBy exchange.add(Bid(Sell, 100, 100))
+  }
+
+  "exchange should endure a maximum size of random bids" in {
+    def randomAmount: Int = ThreadLocalRandom.current().nextInt(Bid.minAmount, Bid.maxAmount + 1)
+    def randomPrice: Int = ThreadLocalRandom.current().nextInt(Bid.minPrice, Bid.maxPrice + 1)
+    def randomDirection: BidType = if(ThreadLocalRandom.current().nextBoolean()) Buy else Sell
+
+    val exchange = new Exchange
+    for(_ <- 1 to Exchange.limit) exchange.add(Bid(randomDirection, randomAmount, randomPrice))
+    exchange.calculate()
+  }
+
+  "exchange should endure a maximum size of random bids 100 times" ignore {
+    def randomAmount: Int = ThreadLocalRandom.current().nextInt(Bid.minAmount, Bid.maxAmount + 1)
+    def randomPrice: Int = ThreadLocalRandom.current().nextInt(Bid.minPrice, Bid.maxPrice + 1)
+    def randomDirection: BidType = if(ThreadLocalRandom.current().nextBoolean()) Buy else Sell
+
+    for(_ <- 1 to 100) {
+      val exchange = new Exchange
+      for(_ <- 1 to Exchange.limit) exchange.add(Bid(randomDirection, randomAmount, randomPrice))
+      exchange.calculate()
+    }
   }
 }
