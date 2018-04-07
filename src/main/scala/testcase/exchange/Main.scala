@@ -2,30 +2,42 @@ package testcase.exchange
 
 import com.typesafe.scalalogging.LazyLogging
 
-/**
-  * Print bids in format '<kind> <amount> <price>', like 'B 50 10.12' or 'S 20 99.99'
-  * 'exchange' to find optimal amount and price
-  * 'quit' or 'exit' to exit
-  */
-object Main extends LazyLogging {
-  def main(args: Array[String]): Unit = {
-    var exchange = new Exchange
+import scala.io.Source
 
-    for (ln <- io.Source.stdin.getLines) ln match {
+object Main {
+  def main(args: Array[String]): Unit = {
+    if(args.length == 1)
+      withFile(args(0))
+    else
+      cliLoop()
+  }
+
+  /**
+    * Looking for a file in a working directory to parse bids, then to calculate optimal price
+    * @param f filename
+    */
+  def withFile(f: String): Unit = {
+    val exchange = new Exchange
+    for (ln <- Source.fromFile(f, "UTF-8").getLines)
+      exchange.add(Bid(ln))
+    println(exchange.calculate())
+    sys.exit(0)
+  }
+
+  /**
+    * Print bids in format '<kind> <amount> <price>', like 'B 50 10.12' or 'S 20 99.99'
+    * 'exchange' to find optimal amount and price
+    * 'quit' or 'exit' to exit
+    */
+  def cliLoop(): Unit = {
+    var exchange = new Exchange
+    for (ln <- Source.stdin.getLines) ln match {
       case "quit" | "exit" =>
         println("Exiting...")
         sys.exit(0)
       case "exchange" =>
-        exchange.calculate() match {
-          case (_, 0) =>
-            println("0 n/a")
-            exchange = new Exchange
-          case (p, a) =>
-            println(s"$a ${p.toDouble / 100}")
-            exchange = new Exchange
-          case other =>
-            throw new RuntimeException(s"Unexpected result $other")
-        }
+        println(exchange.calculate())
+        exchange = new Exchange
       case _ =>
         try {
           exchange.add(Bid(ln))
@@ -34,4 +46,5 @@ object Main extends LazyLogging {
         }
     }
   }
+
 }

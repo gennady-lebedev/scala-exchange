@@ -10,14 +10,14 @@ class ExchangeTest extends WordSpec with Matchers {
     val exchange = new Exchange
     exchange.add(Bid(Buy, 100, 100))
     exchange.add(Bid(Sell, 100, 100))
-    exchange.calculate() should be (100, 100)
+    exchange.calculate() should be ("100 1.0")
   }
 
   "fail if bids doesn't match by price" in {
     val exchange = new Exchange
     exchange.add(Bid(Buy, 100, 10.00))
     exchange.add(Bid(Sell, 100, 100.00))
-    exchange.calculate()._2 should be (0)
+    exchange.calculate() should be ("0 n/a")
   }
 
   "match couple of bids with same prices and amounts" in {
@@ -28,7 +28,7 @@ class ExchangeTest extends WordSpec with Matchers {
     exchange.add(Bid(Sell, 100, 100))
     exchange.add(Bid(Sell, 100, 100))
     exchange.add(Bid(Sell, 100, 100))
-    exchange.calculate() should be (100, 300)
+    exchange.calculate() should be ("300 1.0")
   }
 
   "ignore not optimal prices" in {
@@ -37,7 +37,7 @@ class ExchangeTest extends WordSpec with Matchers {
     exchange.add(Bid(Buy, 100, 10))
     exchange.add(Bid(Sell, 100, 90))
     exchange.add(Bid(Sell, 100, 50))
-    exchange.calculate() should be (50, 100)
+    exchange.calculate() should be ("100 0.5")
   }
 
   "reject 1.000.001's bid" in {

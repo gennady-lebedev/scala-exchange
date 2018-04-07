@@ -15,7 +15,7 @@ class Exchange extends LazyLogging {
     bids += bid
   }
 
-  def calculate(): (Int, Int) = {
+  def calculate(): String = {
     val sell = TreeMap(bids
       .filter(_.kind == Sell)
       .groupBy(_.price)
@@ -44,7 +44,11 @@ class Exchange extends LazyLogging {
       if(a._2 > b._2) a
       else if(a._2 < b._2) b
       else/*a._2 == b._2*/(a._1 + b._1)/2 -> a._2
-    )
+    ) match {
+      case (_, 0) => "0 n/a"
+      case (p, a) => s"$a ${p.toDouble / 100}"
+      case other => throw new RuntimeException(s"Unexpected result $other")
+    }
   }
 }
 
