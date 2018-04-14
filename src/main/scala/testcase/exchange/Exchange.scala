@@ -1,6 +1,10 @@
 package testcase.exchange
 
+import java.util.{Properties, UUID}
+
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 import testcase.exchange.BidTypes._
 
 import scala.collection.mutable
@@ -8,10 +12,20 @@ import scala.collection.immutable.TreeMap
 
 class Exchange extends LazyLogging {
   private val bids = mutable.MutableList[Bid]()
+  private val producer = new KafkaProducer[String, String](producerConfig())
+  private val id = UUID.randomUUID().toString
+
+  def producerConfig(): Properties = {
+    val properties = new Properties()
+    properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+    properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
+    properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
+    properties
+  }
 
   def add(bid: Bid): Unit = {
     if(bids.size >= Exchange.limit) throw new RuntimeException("Orders limit exceeded")
-
+    producer.send(new ProducerRecord("bids", id, bid.toString))
     bids += bid
   }
 

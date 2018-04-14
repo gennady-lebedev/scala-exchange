@@ -16,3 +16,6 @@ To run project use `gradle run`, then enter orders. Enter `exchange` to calculat
 Enter `exit` or `quit` to stop the programm.
 
 To run tests use `gradle test`. 100 x MaxAmount case is included.
+
+Run `docker-compose exec ksql-cli ksql-cli local --bootstrap-server kafka:9092 --schema-registry-url http://schema-registry:8082`
+to start KSQL console

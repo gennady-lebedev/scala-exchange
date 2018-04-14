@@ -9,6 +9,8 @@
 
     <logger name="testcase.exchange" level="INFO"/>
 
+    <logger name="testcase.kafka" level="TRACE"/>
+
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>

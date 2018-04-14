@@ -8,7 +8,12 @@ import testcase.exchange.BidTypes.{Buy, Sell}
   * @param amount size of bid, between 1 and 1000
   * @param price internal representation, cast decimal with precision 2 to Int, between 100 and 10000 (1.00 to 100.00)
   */
-case class Bid(kind: BidKind, amount: Int, price: Int)
+case class Bid(kind: BidKind, amount: Int, price: Int) {
+  override def toString: String = kind match {
+    case Buy => s"B $price $amount"
+    case Sell => s"S $price $amount"
+  }
+}
 
 object Bid {
   val minPrice = 100
